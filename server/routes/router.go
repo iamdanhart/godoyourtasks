@@ -5,12 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/iamdanhart/godoyourtasks/model"
+	"github.com/iamdanhart/godoyourtasks/task_store"
 	"io"
 	"log"
 	"net/http"
 	"strings"
-
-	"github.com/iamdanhart/godoyourtasks/task_store"
 )
 
 var taskStore task_store.TaskStore

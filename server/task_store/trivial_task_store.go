@@ -1,6 +1,8 @@
 package task_store
 
-import "github.com/iamdanhart/godoyourtasks/model"
+import (
+	"github.com/iamdanhart/godoyourtasks/model"
+)
 
 type TrivialTaskStore struct{}
 
