@@ -4,7 +4,7 @@
 --comment: create table for tasks
 create table tasks
 (
-    id   integer primary key not null,
-    task varchar             not null
+    id   integer generated always as identity,
+    task varchar not null
 )
 --rollback DROP TABLE tasks;
