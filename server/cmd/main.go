@@ -9,8 +9,8 @@ import (
 
 func main() {
 
-	taskStore := task_store.TrivialTaskStore{}
-	mux := routes.NewRouter(&taskStore)
+	taskStore := task_store.NewInMemTaskStore()
+	mux := routes.NewRouter(taskStore)
 
 	err := http.ListenAndServe(":8081", mux)
 	log.Fatal(err)

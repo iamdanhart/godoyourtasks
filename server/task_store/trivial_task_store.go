@@ -4,17 +4,24 @@ import (
 	"github.com/iamdanhart/godoyourtasks/model"
 )
 
-type TrivialTaskStore struct{}
+type TrivialTaskStore struct {
+	tasks []model.Task
+}
 
-var trivialTask = model.Task{
-	Id:          1,
-	Description: "Trivial task",
+func NewTrivialTaskStore() *TrivialTaskStore {
+	return &TrivialTaskStore{
+		tasks: []model.Task{
+			{
+				Id:          1,
+				Description: "Trivial task"},
+		},
+	}
 }
 
 func (store *TrivialTaskStore) GetTasks() ([]model.Task, error) {
-	return []model.Task{trivialTask}, nil
+	return store.tasks, nil
 }
 
-func (store *TrivialTaskStore) AddTask(unused *model.Task) error {
+func (store *TrivialTaskStore) AddTask(_ *model.Task) error {
 	return nil
 }

@@ -10,15 +10,16 @@ type InMemTaskStore struct {
 
 func NewInMemTaskStore() *InMemTaskStore {
 	return &InMemTaskStore{
-		tasks: make([]model.Task, 0),
+		tasks: make([]model.Task, 0, 8),
 	}
 }
 
-func (taskStore *InMemTaskStore) GetTasks() []model.Task {
-	return taskStore.tasks
+func (taskStore *InMemTaskStore) GetTasks() ([]model.Task, error) {
+	return taskStore.tasks, nil
 }
 
-func (taskStore *InMemTaskStore) AddTask(task model.Task) error {
-	taskStore.tasks = append(taskStore.tasks, task)
+func (taskStore *InMemTaskStore) AddTask(task *model.Task) error {
+	task.Id = len(taskStore.tasks)
+	taskStore.tasks = append(taskStore.tasks, *task)
 	return nil
 }
