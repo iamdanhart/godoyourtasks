@@ -2,9 +2,9 @@
 
 --changeset dan.hart:1 labels:tasks
 --comment: create table for tasks
-create table tasks
+CREATE TABLE tasks
 (
-    id   integer generated always as identity,
-    task varchar not null
+    id   INTEGER GENERATED ALWAYS AS IDENTITY,
+    task VARCHAR NOT NULL
 )
 --rollback DROP TABLE tasks;
