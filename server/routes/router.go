@@ -28,11 +28,15 @@ func NewRouter(store task_store.TaskStore) *http.ServeMux {
 }
 
 func getTasksHandler(w http.ResponseWriter, r *http.Request) {
-	//w.Header().Set("Content-Type", "application/json")
-	//var tasks []model.Task
 	//var err error
-	tasks, _ := taskStore.GetTasks()
+	tasks, err := taskStore.GetTasks()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Error getting tasks: %v\n", err)
+		return
+	}
 	tasksJson, _ := json.Marshal(tasks)
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(tasksJson)
 }
 
@@ -45,7 +49,8 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	_ = taskStore.AddTask(&newTask)
 	//w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("POST tasks placeholder"))
+	w.WriteHeader(http.StatusCreated)
+	//w.Write([]byte("POST tasks placeholder"))
 }
 
 // reference for parsing body https://www.alexedwards.net/blog/how-to-properly-parse-a-json-request-body
