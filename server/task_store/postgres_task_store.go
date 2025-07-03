@@ -8,15 +8,15 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type DatabaseTaskStore struct {
+type PostgresTaskStore struct {
 	conn *pgxpool.Pool
 }
 
-func NewDatabaseTaskStore(conn *pgxpool.Pool) TaskStore {
-	return DatabaseTaskStore{conn: conn}
+func NewPostgresTaskStore(conn *pgxpool.Pool) TaskStore {
+	return PostgresTaskStore{conn: conn}
 }
 
-func (d DatabaseTaskStore) GetTasks() ([]model.Task, error) {
+func (d PostgresTaskStore) GetTasks() ([]model.Task, error) {
 	query := "SELECT * FROM tasks"
 	rows, err := d.conn.Query(context.Background(), query)
 	if err != nil {
@@ -33,7 +33,7 @@ func (d DatabaseTaskStore) GetTasks() ([]model.Task, error) {
 	return tasks, nil
 }
 
-func (d DatabaseTaskStore) AddTask(task *model.Task) error {
+func (d PostgresTaskStore) AddTask(task *model.Task) error {
 	query := "INSERT INTO tasks (task) VALUES (@taskDescription)"
 	args := pgx.NamedArgs{
 		"taskDescription": task.Description,

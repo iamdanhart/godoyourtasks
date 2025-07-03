@@ -55,16 +55,10 @@ func (handler TaskHandler) addTaskHandler(w http.ResponseWriter, r *http.Request
 
 // reference for parsing body https://www.alexedwards.net/blog/how-to-properly-parse-a-json-request-body
 func parseTask(w http.ResponseWriter, r *http.Request) (model.Task, error) {
-	// Use http.MaxBytesReader to enforce a maximum read of 1MB from the
-	// response body. A request body larger than that will now result in
-	// Decode() returning a "http: request body too large" error.
+	// allow bodies up to 1MB
 	maxBytesReader := http.MaxBytesReader(w, r.Body, 1048576)
 
-	// Setup the decoder and call the DisallowUnknownFields() method on it.
-	// This will cause Decode() to return a "json: unknown field ..." error
-	// if it encounters any extra unexpected fields in the JSON. Strictly
-	// speaking, it returns an error for "keys which do not match any
-	// non-ignored, exported fields in the destination".
+	// explicitly disallow unknown fields in task creation body
 	dec := json.NewDecoder(maxBytesReader)
 	dec.DisallowUnknownFields()
 
