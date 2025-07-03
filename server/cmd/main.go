@@ -21,9 +21,11 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
 		os.Exit(1)
 	}
-	//defer dbpool.Close()
+	defer pool.Close()
 
 	taskStore := task_store.NewDatabaseTaskStore(pool)
+	//_ = pool
+	//taskStore := task_store.NewInMemTaskStore()
 	mux := routes.NewRouter(taskStore)
 
 	err = http.ListenAndServe(":8081", mux)

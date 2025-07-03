@@ -12,24 +12,26 @@ import (
 	"strings"
 )
 
-var taskStore task_store.TaskStore
+type TaskHandler struct {
+	Store task_store.TaskStore
+}
 
 func NewRouter(store task_store.TaskStore) *http.ServeMux {
 	if store == nil {
 		log.Fatalln("Need a non-nil task store")
 	}
-	taskStore = store
+	handler := TaskHandler{store}
 
 	router := http.NewServeMux()
-	router.HandleFunc("GET /tasks", getTasksHandler)
-	router.HandleFunc("POST /tasks", addTaskHandler)
+	router.HandleFunc("GET /tasks", handler.getTasksHandler)
+	router.HandleFunc("POST /tasks", handler.addTaskHandler)
 
 	return router
 }
 
-func getTasksHandler(w http.ResponseWriter, r *http.Request) {
+func (handler TaskHandler) getTasksHandler(w http.ResponseWriter, r *http.Request) {
 	//var err error
-	tasks, err := taskStore.GetTasks()
+	tasks, err := handler.Store.GetTasks()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, "Error getting tasks: %v\n", err)
@@ -40,17 +42,15 @@ func getTasksHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(tasksJson)
 }
 
-func addTaskHandler(w http.ResponseWriter, r *http.Request) {
+func (handler TaskHandler) addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	newTask, err := parseTask(w, r)
 	if err != nil {
 		// parseTask handles writing the error response
 		// so we don't need to dig into the error here
 		return
 	}
-	_ = taskStore.AddTask(&newTask)
-	//w.Header().Set("Content-Type", "application/json")
+	_ = handler.Store.AddTask(&newTask) // TODO handle error
 	w.WriteHeader(http.StatusCreated)
-	//w.Write([]byte("POST tasks placeholder"))
 }
 
 // reference for parsing body https://www.alexedwards.net/blog/how-to-properly-parse-a-json-request-body
