@@ -3,7 +3,10 @@ package task_store
 import (
 	"database/sql"
 	"errors"
-	"github.com/iamdanhart/godoyourtasks/model"
+	"log"
+	"strings"
+
+	"github.com/iamdanhart/godoyourtasks/server/model"
 )
 
 type SqliteTaskStore struct {
@@ -15,23 +18,33 @@ func NewSqliteTaskStore(conn *sql.DB) TaskStore {
 }
 
 func (d SqliteTaskStore) GetTasks() ([]model.Task, error) {
-	query := "SELECT * FROM tasks"
+	query := "SELECT id, task FROM tasks"
 	rows, err := d.conn.Query(query)
 	if err != nil {
 		return []model.Task{}, errors.New("failed to query for tasks: " + err.Error())
 	}
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		if err := rows.Close(); err != nil {
+			log.Printf("failed to close rows: %v", err)
+		}
+	}(rows)
 
 	tasks := make([]model.Task, 0, 8)
 	for rows.Next() {
 		var task model.Task
-		rows.Scan(&task.Id, &task.Description)
+		err := rows.Scan(&task.Id, &task.Description)
+		if err != nil {
+			return nil, err
+		}
 		tasks = append(tasks, task)
 	}
 	return tasks, nil
 }
 
 func (d SqliteTaskStore) AddTask(task *model.Task) error {
+	if strings.TrimSpace(task.Description) == "" {
+		return errors.New("task description must not be blank")
+	}
 	query := "INSERT INTO tasks (task) VALUES (?)"
 	_, err := d.conn.Exec(query, task.Description)
 	if err != nil {

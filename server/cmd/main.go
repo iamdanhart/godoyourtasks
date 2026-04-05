@@ -4,13 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/iamdanhart/godoyourtasks/routes"
-	"github.com/iamdanhart/godoyourtasks/task_store"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"net/http"
 	"os"
 
+	godoyourtasks "github.com/iamdanhart/godoyourtasks"
+	"github.com/iamdanhart/godoyourtasks/server/routes"
+	"github.com/iamdanhart/godoyourtasks/server/task_store"
+	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -32,7 +33,7 @@ func main() {
 		taskStore = task_store.NewPostgresTaskStore(pool)
 		defer pool.Close()
 	case "sqlite":
-		connStr := "file:../tasks.sqlite"
+		connStr := "file:tasks.sqlite"
 		db, err := sql.Open("sqlite3", connStr)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Unable to establish sqlite connection: %v\n", err)
@@ -43,7 +44,7 @@ func main() {
 		taskStore = task_store.NewInMemTaskStore()
 	}
 
-	mux := routes.NewRouter(taskStore)
+	mux := routes.NewRouter(taskStore, godoyourtasks.ClientFiles)
 	err := http.ListenAndServe(":8081", mux)
 	log.Fatal(err)
 }

@@ -3,7 +3,9 @@ package task_store
 import (
 	"context"
 	"errors"
-	"github.com/iamdanhart/godoyourtasks/model"
+	"strings"
+
+	"github.com/iamdanhart/godoyourtasks/server/model"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -17,7 +19,7 @@ func NewPostgresTaskStore(conn *pgxpool.Pool) TaskStore {
 }
 
 func (d PostgresTaskStore) GetTasks() ([]model.Task, error) {
-	query := "SELECT * FROM tasks"
+	query := "SELECT id, task FROM tasks"
 	rows, err := d.conn.Query(context.Background(), query)
 	if err != nil {
 		return []model.Task{}, errors.New("failed to query for tasks: " + err.Error())
@@ -34,6 +36,9 @@ func (d PostgresTaskStore) GetTasks() ([]model.Task, error) {
 }
 
 func (d PostgresTaskStore) AddTask(task *model.Task) error {
+	if strings.TrimSpace(task.Description) == "" {
+		return errors.New("task description must not be blank")
+	}
 	query := "INSERT INTO tasks (task) VALUES (@taskDescription)"
 	args := pgx.NamedArgs{
 		"taskDescription": task.Description,

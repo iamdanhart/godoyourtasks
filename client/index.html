@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <h1>My Tasks</h1>
+    <ul id="task-list"></ul>
+
+    <script type="module">
+        import getTasks from './fetchTasks.js';
+
+        const tasks = await getTasks();
+        const list = document.getElementById('task-list');
+        for (const task of tasks) {
+            const li = document.createElement('li');
+            li.textContent = task.Id + " " + task.Description;
+            list.appendChild(li);
+        }
+    </script>
+</body>
+</html>

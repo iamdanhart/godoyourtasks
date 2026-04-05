@@ -1,7 +1,10 @@
 package task_store
 
 import (
-	"github.com/iamdanhart/godoyourtasks/model"
+	"errors"
+	"strings"
+
+	"github.com/iamdanhart/godoyourtasks/server/model"
 )
 
 type InMemTaskStore struct {
@@ -19,6 +22,9 @@ func (taskStore *InMemTaskStore) GetTasks() ([]model.Task, error) {
 }
 
 func (taskStore *InMemTaskStore) AddTask(task *model.Task) error {
+	if strings.TrimSpace(task.Description) == "" {
+		return errors.New("task description must not be blank")
+	}
 	task.Id = len(taskStore.tasks)
 	taskStore.tasks = append(taskStore.tasks, *task)
 	return nil

@@ -4,19 +4,21 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/iamdanhart/godoyourtasks/model"
-	"github.com/iamdanhart/godoyourtasks/task_store"
 	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/iamdanhart/godoyourtasks/server/model"
+	"github.com/iamdanhart/godoyourtasks/server/task_store"
 )
 
 type TaskHandler struct {
 	Store task_store.TaskStore
 }
 
-func NewRouter(store task_store.TaskStore) *http.ServeMux {
+func NewRouter(store task_store.TaskStore, clientFiles fs.FS) *http.ServeMux {
 	if store == nil {
 		log.Fatalln("Need a non-nil task store")
 	}
@@ -25,6 +27,7 @@ func NewRouter(store task_store.TaskStore) *http.ServeMux {
 	router := http.NewServeMux()
 	router.HandleFunc("GET /tasks", handler.getTasksHandler)
 	router.HandleFunc("POST /tasks", handler.addTaskHandler)
+	router.Handle("/", http.FileServer(http.FS(clientFiles)))
 
 	return router
 }
@@ -49,7 +52,10 @@ func (handler TaskHandler) addTaskHandler(w http.ResponseWriter, r *http.Request
 		// so we don't need to dig into the error here
 		return
 	}
-	_ = handler.Store.AddTask(&newTask) // TODO handle error
+	if err := handler.Store.AddTask(&newTask); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	w.WriteHeader(http.StatusCreated)
 }
 
