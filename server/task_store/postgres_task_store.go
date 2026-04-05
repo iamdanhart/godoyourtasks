@@ -3,7 +3,6 @@ package task_store
 import (
 	"context"
 	"errors"
-	"strings"
 
 	"github.com/iamdanhart/godoyourtasks/server/model"
 	"github.com/jackc/pgx/v5"
@@ -36,9 +35,6 @@ func (d PostgresTaskStore) GetTasks() ([]model.Task, error) {
 }
 
 func (d PostgresTaskStore) AddTask(task *model.Task) error {
-	if strings.TrimSpace(task.Description) == "" {
-		return errors.New("task description must not be blank")
-	}
 	query := "INSERT INTO tasks (task) VALUES (@taskDescription)"
 	args := pgx.NamedArgs{
 		"taskDescription": task.Description,

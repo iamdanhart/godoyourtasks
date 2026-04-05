@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"log"
-	"strings"
 
 	"github.com/iamdanhart/godoyourtasks/server/model"
 )
@@ -42,9 +41,6 @@ func (d SqliteTaskStore) GetTasks() ([]model.Task, error) {
 }
 
 func (d SqliteTaskStore) AddTask(task *model.Task) error {
-	if strings.TrimSpace(task.Description) == "" {
-		return errors.New("task description must not be blank")
-	}
 	query := "INSERT INTO tasks (task) VALUES (?)"
 	_, err := d.conn.Exec(query, task.Description)
 	if err != nil {

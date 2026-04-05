@@ -86,6 +86,12 @@ func parseTask(w http.ResponseWriter, r *http.Request) (model.Task, error) {
 		return model.Task{}, errors.New("")
 	}
 
+	if strings.TrimSpace(newTask.Description) == "" {
+		msg := "Task description must not be blank"
+		http.Error(w, msg, http.StatusBadRequest)
+		return model.Task{}, errors.New(msg)
+	}
+
 	return newTask, nil
 }
 
