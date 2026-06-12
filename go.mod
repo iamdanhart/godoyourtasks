@@ -3,7 +3,7 @@ module github.com/iamdanhart/godoyourtasks
 go 1.25.0
 
 require (
-	github.com/jackc/pgx/v5 v5.9.1
+	github.com/jackc/pgx/v5 v5.9.2
 	github.com/mattn/go-sqlite3 v1.14.40
 )
 
